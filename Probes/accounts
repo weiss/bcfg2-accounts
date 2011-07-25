@@ -1,0 +1,26 @@
+#!/bin/sh
+
+set -e
+set -u
+
+export PATH='/bin:/sbin:/usr/bin:/usr/sbin'
+
+IFS=':'
+
+getent passwd | while read name password uid gid gecos home shell
+do
+	group=$(id -g -n "$name" 2>'/dev/null' || :)
+	extra=$(id -G -n "$name" 2>'/dev/null' \
+	    | tr ' ' '\n'                      \
+	    | grep -v "^$group$"               \
+	    | tr '\n' ' ')
+
+	echo "U:$name:$uid:$group:$gecos:$home:$shell:$extra"
+done
+
+getent group | while read name password gid members
+do
+	echo "G:$name:$gid"
+done
+
+# vim:set textwidth=80:

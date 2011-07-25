@@ -1,0 +1,61 @@
+<xsd:schema xmlns:xsd='http://www.w3.org/2001/XMLSchema'>
+
+  <xsd:annotation>
+    <xsd:documentation>
+      XML Schema for Properties/keys.xml
+      Holger Weiss
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:complexType name='pubKeyType'>
+    <xsd:attribute name='file' type='xsd:string' use='required'/>
+  </xsd:complexType>
+
+  <xsd:complexType name='innerKeyGroupType'>
+    <xsd:attribute name='name' type='xsd:string' use='required'/>
+  </xsd:complexType>
+
+  <xsd:complexType name='innerContainerType'>
+    <xsd:choice maxOccurs='unbounded'>
+      <xsd:element name='PubKey' type='pubKeyType'/>
+      <xsd:element name='KeyGroup' type='innerKeyGroupType'/>
+      <xsd:element name='Client' type='innerContainerType'/>
+      <xsd:element name='Group' type='innerContainerType'/>
+    </xsd:choice>
+    <xsd:attribute name='name' type='xsd:string' use='required'/>
+    <xsd:attribute name='negate' type='xsd:boolean'/>
+  </xsd:complexType>
+
+  <xsd:complexType name='outerKeyGroupType'>
+    <xsd:choice minOccurs='0' maxOccurs='unbounded'>
+      <xsd:element name='PubKey' type='pubKeyType'/>
+      <xsd:element name='KeyGroup' type='innerKeyGroupType'/>
+      <xsd:element name='Client' type='innerContainerType'/>
+      <xsd:element name='Group' type='innerContainerType'/>
+    </xsd:choice>
+    <xsd:attribute name='name' type='xsd:string' use='required'/>
+  </xsd:complexType>
+
+  <xsd:complexType name='outerContainerType'>
+    <xsd:choice maxOccurs='unbounded'>
+      <xsd:element name='KeyGroup' type='outerKeyGroupType'/>
+      <xsd:element name='Group' type='outerContainerType'/>
+      <xsd:element name='Client' type='outerContainerType'/>
+    </xsd:choice>
+    <xsd:attribute name='name' type='xsd:string' use='required'/>
+    <xsd:attribute name='negate' type='xsd:boolean'/>
+  </xsd:complexType>
+
+  <xsd:complexType name='propertiesType'>
+    <xsd:choice minOccurs='0' maxOccurs='unbounded'>
+      <xsd:element name='KeyGroup' type='outerKeyGroupType'/>
+      <xsd:element name='Client' type='outerContainerType'/>
+      <xsd:element name='Group' type='outerContainerType'/>
+    </xsd:choice>
+  </xsd:complexType>
+
+  <xsd:element name='Properties' type='propertiesType'/>
+
+</xsd:schema>
+
+<!-- vim:set expandtab softtabstop=2 shiftwidth=2 textwidth=80: -->

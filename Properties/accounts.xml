@@ -1,0 +1,21 @@
+<Properties>
+
+  <UnixUser name='root' uid='0'/>
+  <UnixGroup name='root' uid='0'/>
+
+  <Group name='web-server'>
+    <UnixUser
+     name='www-adm'
+     group='www'
+     uid='802'
+     gid='800'
+     gecos='Web Administration'
+     home='/server/www-adm'
+     shell='/bin/zsh'
+     extra_groups='www-data www-run'
+     key_group='web-admins'/>
+  </Group>
+
+</Properties>
+
+<!-- vim:set expandtab softtabstop=2 shiftwidth=2 textwidth=80: -->

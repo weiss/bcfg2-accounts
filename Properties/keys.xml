@@ -1,0 +1,21 @@
+<Properties>
+
+  <KeyGroup name='global'>
+    <PubKey file='barack.pub'/>
+    <PubKey file='dmitrij.pub'/>
+  </KeyGroup>
+
+  <KeyGroup name='web-admins'>
+    <KeyGroup name='global'/> <!-- Include "global" admins. -->
+    <PubKey file='angela.pub'/>
+    <PubKey file='david.pub'/>
+    <PubKey file='nicolas.pub'/>
+    <Client name='www-devel.example.com'>
+      <PubKey file='fidel.pub'/>
+      <PubKey file='hugo.pub'/>
+    </Client>
+  </KeyGroup>
+
+</Properties>
+
+<!-- vim:set expandtab softtabstop=2 shiftwidth=2 textwidth=80: -->

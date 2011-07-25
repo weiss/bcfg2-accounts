@@ -1,0 +1,142 @@
+<?python
+
+  # Configuration
+  default_shell = '/bin/sh'
+  key_directory = '/var/lib/bcfg2/keys'
+
+  key_group = dict()
+  desired = {
+    'user': dict(),
+    'group': dict()
+  }
+  existing = {
+    'user': dict(),
+    'group': dict()
+  }
+
+  def todo(kind, name):
+    if name not in existing[kind]:
+      return 'add'
+    for key in existing[kind][name]:
+      if existing[kind][name][key] != desired[kind][name][key]:
+        return 'mod'
+    return None
+
+  def key_files(group):
+    file_names = list()
+    for el in group:
+      if el.tag == 'PubKey':
+        file_names.append(el.get('file'))
+      elif el.tag == 'KeyGroup':
+        file_names.extend(key_files(key_group[el.get('name')]))
+    return file_names
+
+  def auth_keys(group):
+    keys = ['#', '# Automatically created by Bcfg2.', '#']
+    for file in key_files(key_group[group]):
+      f = open(key_directory + '/' + file)
+      keys.append(f.read().rstrip('\n'))
+      f.close()
+    return '\n'.join(keys) + '\n'
+
+  for el in metadata.Properties['keys.xml'].Match(metadata):
+    if el.tag == 'KeyGroup':
+      key_group[el.get('name')] = el
+
+  for el in metadata.Properties['accounts.xml'].Match(metadata):
+    if el.tag == 'UnixUser':
+      base_dir = '/' if el.get('name') == 'root' else '/home/'
+      user = {
+        'uid': el.get('uid'),
+        'gid': el.get('gid', el.get('uid')),
+        'group': el.get('group', el.get('name')),
+        'gecos': el.get('gecos', el.get('name').capitalize()),
+        'home': el.get('home', base_dir + el.get('name')),
+        'shell': el.get('shell', default_shell),
+        'extra_groups': ','.join(sorted(el.get('extra_groups', '').split())),
+        'key_group': el.get('key_group')
+      }
+      desired['group'][user['group']] = {
+        'gid': user['gid']
+      }
+      desired['user'][el.get('name')] = user
+    elif el.tag == 'UnixGroup':
+      desired['group'][el.get('name')] = {
+        'gid': el.get('gid')
+      }
+
+  for line in metadata.Probes['accounts'].splitlines():
+    fields = line.split(':')
+    if fields[0] == 'U':
+      existing['user'][fields[1]] = {
+        'uid': fields[2],
+        'group': fields[3],
+        'gecos': fields[4],
+        'home': fields[5],
+        'shell': fields[6],
+        'extra_groups': ','.join(sorted(fields[7].split()))
+      }
+    elif fields[0] == 'G':
+      existing['group'][fields[1]] = {
+        'gid': fields[2]
+      }
+?>
+
+<Bundle name="accounts" xmlns:py="http://genshi.edgewall.org/">
+
+  <py:for each="(name, group) in desired.group.items()">
+    <py:with vars="action = todo('group', name)">
+      <py:if test="action != None">
+        <BoundAction
+         name="group$action $name"
+         timing="pre"
+         when="always"
+         status="check"
+         command="/usr/sbin/group$action
+          -g '$group.gid'
+             '$name'"/>
+      </py:if>
+    </py:with>
+  </py:for>
+
+  <py:for each="(name, user) in desired.user.items()">
+    <py:with vars="action = todo('user', name)">
+      <py:if test="action != None">
+        <BoundAction
+         name="user$action $name"
+         timing="pre"
+         when="always"
+         status="check"
+         command="/usr/sbin/user$action
+          -m
+          -u '$user.uid'
+          -g '$user.group'
+          -G '$user.extra_groups'
+          -d '$user.home'
+          -s '$user.shell'
+          -c '$user.gecos'
+             '$name'"/>
+      </py:if>
+    </py:with>
+
+    <py:if test="user.key_group">
+      <BoundPath
+       type="directory"
+       name="$user.home/.ssh"
+       owner="$name"
+       group="$user.group"
+       perms="755"/>
+
+      <BoundPath
+       type="file"
+       name="$user.home/.ssh/authorized_keys"
+       owner="$name"
+       group="$user.group"
+       perms="444"
+       paranoid="true">${auth_keys(user.key_group)}</BoundPath>
+    </py:if>
+  </py:for>
+
+</Bundle>
+
+<!-- vim:set expandtab softtabstop=2 shiftwidth=2 textwidth=80: -->

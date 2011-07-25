@@ -1,0 +1,57 @@
+<xsd:schema xmlns:xsd='http://www.w3.org/2001/XMLSchema'>
+
+  <xsd:annotation>
+    <xsd:documentation>
+      XML Schema for Properties/accounts.xml
+      Holger Weiss
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:simpleType name='pathType'>
+    <xsd:restriction base='xsd:string'>
+      <xsd:pattern value='/.*'/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name='unixUserType'>
+    <xsd:attribute name='name' type='xsd:string' use='required'/>
+    <xsd:attribute name='uid' type='xsd:unsignedInt' use='required'/>
+    <xsd:attribute name='gid' type='xsd:unsignedInt'/>
+    <xsd:attribute name='group' type='xsd:string'/>
+    <xsd:attribute name='gecos' type='xsd:string'/>
+    <xsd:attribute name='home' type='pathType'/>
+    <xsd:attribute name='shell' type='pathType'/>
+    <xsd:attribute name='extra_groups' type='xsd:string'/>
+    <xsd:attribute name='key_group' type='xsd:string'/>
+  </xsd:complexType>
+
+  <xsd:complexType name='unixGroupType'>
+    <xsd:attribute name='name' type='xsd:string' use='required'/>
+    <xsd:attribute name='gid' type='xsd:unsignedInt' use='required'/>
+  </xsd:complexType>
+
+  <xsd:complexType name='containerType'>
+    <xsd:choice maxOccurs='unbounded'>
+      <xsd:element name='UnixUser' type='unixUserType'/>
+      <xsd:element name='UnixGroup' type='unixGroupType'/>
+      <xsd:element name='Client' type='containerType'/>
+      <xsd:element name='Group' type='containerType'/>
+    </xsd:choice>
+    <xsd:attribute name='name' type='xsd:string' use='required'/>
+    <xsd:attribute name='negate' type='xsd:boolean'/>
+  </xsd:complexType>
+
+  <xsd:complexType name='propertiesType'>
+    <xsd:choice minOccurs='0' maxOccurs='unbounded'>
+      <xsd:element name='UnixUser' type='unixUserType'/>
+      <xsd:element name='UnixGroup' type='unixGroupType'/>
+      <xsd:element name='Client' type='containerType'/>
+      <xsd:element name='Group' type='containerType'/>
+    </xsd:choice>
+  </xsd:complexType>
+
+  <xsd:element name='Properties' type='propertiesType'/>
+
+</xsd:schema>
+
+<!-- vim:set expandtab softtabstop=2 shiftwidth=2 textwidth=80: -->
