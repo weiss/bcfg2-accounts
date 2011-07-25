@@ -14,6 +14,15 @@
     'group': dict()
   }
 
+  def matches_me(container):
+    if container.tag == 'Group':
+      negate = container.get('negate', 'false').lower() == 'true'
+      return metadata.inGroup(container.get('name')) ^ negate
+    elif container.tag == 'Client':
+      negate = container.get('negate', 'false').lower() == 'true'
+      return (container.get('name') == metadata.hostname) ^ negate
+    return False
+
   def todo(kind, name):
     if name not in existing[kind]:
       return 'add'
@@ -39,31 +48,37 @@
       f.close()
     return '\n'.join(keys) + '\n'
 
-  for el in metadata.Properties['keys.xml'].Match(metadata):
-    if el.tag == 'KeyGroup':
-      key_group[el.get('name')] = el
+  def parse_keys(elements):
+    for el in elements:
+      if el.tag == 'KeyGroup':
+        key_group[el.get('name')] = el
+      elif matches_me(el):
+        parse_keys(el)
 
-  for el in metadata.Properties['accounts.xml'].Match(metadata):
-    if el.tag == 'UnixUser':
-      base_dir = '/' if el.get('name') == 'root' else '/home/'
-      user = {
-        'uid': el.get('uid'),
-        'gid': el.get('gid', el.get('uid')),
-        'group': el.get('group', el.get('name')),
-        'gecos': el.get('gecos', el.get('name').capitalize()),
-        'home': el.get('home', base_dir + el.get('name')),
-        'shell': el.get('shell', default_shell),
-        'extra_groups': ','.join(sorted(el.get('extra_groups', '').split())),
-        'key_group': el.get('key_group')
-      }
-      desired['group'][user['group']] = {
-        'gid': user['gid']
-      }
-      desired['user'][el.get('name')] = user
-    elif el.tag == 'UnixGroup':
-      desired['group'][el.get('name')] = {
-        'gid': el.get('gid')
-      }
+  def parse_accounts(elements):
+    for el in elements:
+      if el.tag == 'UnixUser':
+        base_dir = '/' if el.get('name') == 'root' else '/home/'
+        user = {
+          'uid': el.get('uid'),
+          'gid': el.get('gid', el.get('uid')),
+          'group': el.get('group', el.get('name')),
+          'gecos': el.get('gecos', el.get('name').capitalize()),
+          'home': el.get('home', base_dir + el.get('name')),
+          'shell': el.get('shell', default_shell),
+          'extra_groups': ','.join(sorted(el.get('extra_groups', '').split())),
+          'key_group': el.get('key_group')
+        }
+        desired['group'][user['group']] = {
+          'gid': user['gid']
+        }
+        desired['user'][el.get('name')] = user
+      elif el.tag == 'UnixGroup':
+        desired['group'][el.get('name')] = {
+          'gid': el.get('gid')
+        }
+      elif matches_me(el):
+        parse_accounts(el)
 
   for line in metadata.Probes['accounts'].splitlines():
     fields = line.split(':')
@@ -80,6 +95,16 @@
       existing['group'][fields[1]] = {
         'gid': fields[2]
       }
+
+  try:
+    accounts_xml = metadata.Properties['accounts.xml'].xdata
+    keys_xml = metadata.Properties['keys.xml'].xdata
+  except AttributeError: # We're running on Bcfg2 1.1.x or earlier.
+    accounts_xml = metadata.Properties['accounts.xml'].data
+    keys_xml = metadata.Properties['keys.xml'].data
+
+  parse_accounts(accounts_xml)
+  parse_keys(keys_xml)
 ?>
 
 <Bundle name="accounts" xmlns:py="http://genshi.edgewall.org/">

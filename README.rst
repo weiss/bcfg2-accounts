@@ -27,15 +27,15 @@ Prerequisites
   - ``groupmod(8)``
   - ``getent(1)``
 
-  The `Bundler/accounts.xml`_ template expects to find the first four of
+  The `Bundler/accounts.genshi`_ template expects to find the first four of
   these commands in the ``/usr/sbin`` directory of the client.  If they are
   installed to another location, the ``<BoundAction>`` entries in the
-  `Bundler/accounts.xml`_ template must be modified accordingly.
+  `Bundler/accounts.genshi`_ template must be modified accordingly.
 
 Installation
 ------------
 
-Copy `Bundler/accounts.xml`_, `Probes/accounts`_,
+Copy `Bundler/accounts.genshi`_, `Probes/accounts`_,
 `Properties/accounts.xsd`_, and `Properties/keys.xsd`_ to your Bcfg2_
 configuration repository (which is located at ``/var/lib/bcfg2`` by
 default).
@@ -70,7 +70,7 @@ group        primary group name *(default: user name)*
 gid          group's GID *(default: uid)*
 gecos        comment *(default: capitalized user name)*
 home         home directory *(default: /home/name or /root)*
-shell        login shell *(default: specified in Bundler/accounts.xml)*
+shell        login shell *(default: specified in Bundler/accounts.genshi)*
 extra_groups space-separated list of supplementary groups *(default: none)*
 key_group    see below *(default: don't touch the authorized_keys file)*
 ============ ==============================================================
@@ -95,7 +95,7 @@ Properties/keys.xml
 First of all, any SSH public key files which might be referenced in the
 specification must be copied into the directory ``/var/lib/bcfg2/keys``.  To
 change this directory path, the ``key_directory`` setting at the top of the
-`Bundler/accounts.xml`_ file must be modified.
+`Bundler/accounts.genshi`_ file must be modified.
 
 In the Properties/keys.xml file, SSH public key files are grouped using
 ``<PubKey file="foo.pub">`` entries within ``<KeyGroup name="bar">`` tags.
@@ -141,8 +141,8 @@ IN THE SOFTWARE.
 
 .. _examples:
    https://github.com/weiss/bcfg2-accounts/tree/master/Properties
-.. _Bundler/accounts.xml:
-   https://raw.github.com/weiss/bcfg2-accounts/master/Bundler/accounts.xml
+.. _Bundler/accounts.genshi:
+   https://raw.github.com/weiss/bcfg2-accounts/master/Bundler/accounts.genshi
 .. _Probes/accounts:
    https://raw.github.com/weiss/bcfg2-accounts/master/Probes/accounts
 .. _Properties/accounts.xml:
