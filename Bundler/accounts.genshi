@@ -1,4 +1,5 @@
 <?python
+  from genshi.template import TemplateError
 
   # Configuration
   default_shell = '/bin/sh'
@@ -32,17 +33,21 @@
     return None
 
   def key_files(group):
+    try:
+      elements = key_group[group]
+    except KeyError:
+      raise TemplateError, 'Key group "%s" is not defined' % group
     file_names = list()
-    for el in group:
+    for el in elements:
       if el.tag == 'PubKey':
         file_names.append(el.get('file'))
       elif el.tag == 'KeyGroup':
-        file_names.extend(key_files(key_group[el.get('name')]))
+        file_names.extend(key_files(el.get('name')))
     return file_names
 
   def auth_keys(group):
     keys = ['#', '# Automatically created by Bcfg2.', '#']
-    for file in key_files(key_group[group]):
+    for file in key_files(group):
       f = open(key_directory + '/' + file)
       keys.append(f.read().rstrip('\n'))
       f.close()
