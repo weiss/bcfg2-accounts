@@ -48,9 +48,13 @@
   def auth_keys(group):
     keys = ['#', '# Automatically created by Bcfg2.', '#']
     for file in key_files(group):
-      f = open(key_directory + '/' + file)
-      keys.append(f.read().rstrip('\n'))
-      f.close()
+      path = key_directory + '/' + file
+      try:
+        f = open(path)
+        keys.append(f.read().rstrip('\n'))
+        f.close()
+      except IOError, (errno, strerror):
+        raise TemplateError, 'Cannot read %s: %s' % (path, strerror)
     return '\n'.join(keys) + '\n'
 
   def parse_keys(elements):
