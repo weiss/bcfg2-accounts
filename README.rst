@@ -35,10 +35,13 @@ Prerequisites
 Installation
 ------------
 
-Copy `Bundler/accounts.genshi`_, `Probes/accounts`_,
-`Properties/accounts.xsd`_, and `Properties/keys.xsd`_ to your Bcfg2_
-configuration repository (which is located at ``/var/lib/bcfg2`` by
-default).
+* Copy `Bundler/accounts.genshi`_, `Probes/accounts`_,
+  `Properties/accounts.xsd`_, and `Properties/keys.xsd`_ to your Bcfg2_
+  configuration repository (which is located at ``/var/lib/bcfg2`` by
+  default).
+
+* Add ``<Bundle name='accounts'/>`` to the desired group(s) in your
+  `Metadata/groups.xml`_ file.
 
 Usage
 -----
@@ -153,6 +156,8 @@ IN THE SOFTWARE.
    https://raw.github.com/weiss/bcfg2-accounts/master/Properties/keys.xml
 .. _Properties/keys.xsd:
    https://raw.github.com/weiss/bcfg2-accounts/master/Properties/keys.xsd
+.. _Metadata/groups.xml:
+   http://docs.bcfg2.org/server/plugins/grouping/metadata.html
 .. _Bundler documentation:
    http://docs.bcfg2.org/server/plugins/structures/bundler/
 .. _Bcfg2:
