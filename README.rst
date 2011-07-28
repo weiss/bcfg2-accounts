@@ -101,9 +101,9 @@ change this directory path, the ``key_directory`` setting at the top of the
 `Bundler/accounts.genshi`_ file must be modified.
 
 In the Properties/keys.xml file, SSH public key files are grouped using
-``<PubKey file="foo.pub">`` entries within ``<KeyGroup name="bar">`` tags.
+``<PubKey file='foo.pub'>`` entries within ``<KeyGroup name='bar'>`` tags.
 These ``<KeyGroup>`` tags may also include other ``<KeyGroup>`` tags such as
-``<KeyGroup name="inherited"/>`` in order to include the members of the
+``<KeyGroup name='inherited'/>`` in order to include the members of the
 ``inherited`` group.
 
 The ``<KeyGroup>`` name can then be referenced using the ``key_group``
