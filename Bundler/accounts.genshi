@@ -120,7 +120,7 @@
 
   <py:for each="(name, group) in desired.group.items()">
     <py:with vars="action = todo('group', name)">
-      <py:if test="action != None">
+      <py:if test="action is not None">
         <BoundAction
          name="group$action $name"
          timing="pre"
@@ -135,7 +135,7 @@
 
   <py:for each="(name, user) in desired.user.items()">
     <py:with vars="action = todo('user', name)">
-      <py:if test="action != None">
+      <py:if test="action is not None">
         <BoundAction
          name="user$action $name"
          timing="pre"
@@ -153,7 +153,7 @@
       </py:if>
     </py:with>
 
-    <py:if test="user.key_group">
+    <py:if test="user.key_group is not None">
       <BoundPath
        type="directory"
        name="$user.home/.ssh"
