@@ -95,13 +95,13 @@ on all clients in question.
 Properties/keys.xml
 ~~~~~~~~~~~~~~~~~~~
 
-First of all, any SSH public key files which might be referenced in the
+First of all, the SSH public key files which will be referenced in the
 specification must be copied into the directory ``/var/lib/bcfg2/keys``.  To
 change this directory path, the ``key_directory`` setting at the top of the
 `Bundler/accounts.genshi`_ file must be modified.
 
 In the Properties/keys.xml file, SSH public key files are grouped using
-``<PubKey file='foo.pub'>`` entries within ``<KeyGroup name='bar'>`` tags.
+``<PubKey file='foo.pub'/>`` entries within ``<KeyGroup name='bar'>`` tags.
 These ``<KeyGroup>`` tags may also include other ``<KeyGroup>`` tags such as
 ``<KeyGroup name='inherited'/>`` in order to include the members of the
 ``inherited`` group.
