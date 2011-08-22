@@ -30,7 +30,6 @@
     for key in existing[kind][name]:
       if existing[kind][name][key] != desired[kind][name][key]:
         return 'mod'
-    return None
 
   def key_files(group):
     try:
