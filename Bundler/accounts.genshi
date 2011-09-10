@@ -106,10 +106,16 @@
 
   try:
     accounts_xml = metadata.Properties['accounts.xml'].xdata
-    keys_xml = metadata.Properties['keys.xml'].xdata
+    try:
+      keys_xml = metadata.Properties['keys.xml'].xdata
+    except KeyError:
+      keys_xml = list()
   except AttributeError: # We're running on Bcfg2 1.1.x or earlier.
     accounts_xml = metadata.Properties['accounts.xml'].data
-    keys_xml = metadata.Properties['keys.xml'].data
+    try:
+      keys_xml = metadata.Properties['keys.xml'].data
+    except KeyError:
+      keys_xml = list()
 
   parse_accounts(accounts_xml)
   parse_keys(keys_xml)
