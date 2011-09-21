@@ -14,6 +14,7 @@ do
 	    | tr ' ' '\n'                      \
 	    | grep -v "^$group$"               \
 	    | tr '\n' ' ')
+	extra=${extra% }
 
 	echo "U:$name:$uid:$group:$gecos:$home:$shell:$extra"
 done
