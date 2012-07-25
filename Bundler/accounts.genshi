@@ -66,7 +66,10 @@
   def parse_accounts(elements):
     for el in elements:
       if el.tag == 'UnixUser':
-        base_dir = '/' if el.get('name') == 'root' else '/home/'
+        if el.get('name') == 'root':
+          base_dir = '/'
+        else:
+          base_dir = '/home/'
         user = {
           'uid': el.get('uid'),
           'gid': el.get('gid', el.get('uid')),
