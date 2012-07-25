@@ -91,21 +91,22 @@
       elif matches_me(el):
         parse_accounts(el)
 
-  for line in metadata.Probes['accounts'].splitlines():
-    fields = line.split(':')
-    if fields[0] == 'U':
-      existing['user'][fields[1]] = {
-        'uid': fields[2],
-        'group': fields[3],
-        'gecos': fields[4],
-        'home': fields[5],
-        'shell': fields[6],
-        'extra_groups': ','.join(sorted(fields[7].split()))
-      }
-    elif fields[0] == 'G':
-      existing['group'][fields[1]] = {
-        'gid': fields[2]
-      }
+  if 'accounts' in metadata.Probes:
+    for line in metadata.Probes['accounts'].splitlines():
+      fields = line.split(':')
+      if fields[0] == 'U':
+        existing['user'][fields[1]] = {
+          'uid': fields[2],
+          'group': fields[3],
+          'gecos': fields[4],
+          'home': fields[5],
+          'shell': fields[6],
+          'extra_groups': ','.join(sorted(fields[7].split()))
+        }
+      elif fields[0] == 'G':
+        existing['group'][fields[1]] = {
+          'gid': fields[2]
+        }
 
   try:
     accounts_xml = metadata.Properties['accounts.xml'].xdata
