@@ -14,6 +14,10 @@
     'user': dict(),
     'group': dict()
   }
+  remove = {
+    'user': dict(),
+    'group': dict()
+  }
 
   def matches_me(container):
     if container.tag == 'Group':
@@ -119,15 +123,51 @@
 
   parse_accounts(accounts_xml)
   parse_keys(keys_xml)
+
+  euids = {}  # map of uid -> username used to index into existing
+  # check if desired uid is already in use
+  for euser in existing['user']:
+    euids[existing['user'][euser]['uid']] = euser
+
+  for duser in desired['user']:
+    duid = desired['user'][duser]['uid']
+    if duid in euids \
+      and duser not in existing['user']:
+      """
+      If we get here, it means that the desired user's uid already exists
+      on the client but the username doesn't match what's on the client.
+
+      In this case, we want to remove the existing user and create a new
+      user with the old uid.
+      """
+      remove['user'][euids[duid]] = existing['user'][euids[duid]]
+
 ?>
 
 <Bundle name="accounts" xmlns:py="http://genshi.edgewall.org/">
+
+  <!-- The numbers in the Action names are used to enforce ordering when
+       the configuration is sent to the client. -->
+  <py:for each="name in remove.user.keys()">
+    <BoundAction name="1userdel $name"
+     timing="pre"
+     when="always"
+     status="check"
+     command="/usr/sbin/userdel '$name'"/>
+  </py:for>
+  <py:for each="name in remove.group.keys()">
+    <BoundAction name="2groupdel $name"
+     timing="pre"
+     when="always"
+     status="check"
+     command="/usr/sbin/groupdel '$name'"/>
+  </py:for>
 
   <py:for each="(name, group) in desired.group.items()">
     <py:with vars="action = todo('group', name)">
       <py:if test="action is not None">
         <BoundAction
-         name="group$action $name"
+         name="3group$action $name"
          timing="pre"
          when="always"
          status="check"
@@ -142,7 +182,7 @@
     <py:with vars="action = todo('user', name)">
       <py:if test="action is not None">
         <BoundAction
-         name="user$action $name"
+         name="4user$action $name"
          timing="pre"
          when="always"
          status="check"
