@@ -104,18 +104,11 @@
         'gid': fields[2]
       }
 
+  accounts_xml = metadata.Properties['accounts.xml'].xdata
   try:
-    accounts_xml = metadata.Properties['accounts.xml'].xdata
-    try:
-      keys_xml = metadata.Properties['keys.xml'].xdata
-    except KeyError:
-      keys_xml = list()
-  except AttributeError: # We're running on Bcfg2 1.1.x or earlier.
-    accounts_xml = metadata.Properties['accounts.xml'].data
-    try:
-      keys_xml = metadata.Properties['keys.xml'].data
-    except KeyError:
-      keys_xml = list()
+    keys_xml = metadata.Properties['keys.xml'].xdata
+  except KeyError:
+    keys_xml = list()
 
   parse_accounts(accounts_xml)
   parse_keys(keys_xml)
