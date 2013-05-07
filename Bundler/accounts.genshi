@@ -164,14 +164,14 @@
        name="$user.home/.ssh"
        owner="$name"
        group="$user.group"
-       perms="755"/>
+       mode="755"/>
 
       <BoundPath
        type="file"
        name="$user.home/.ssh/authorized_keys"
        owner="$name"
        group="$user.group"
-       perms="444"
+       mode="444"
        paranoid="true">${auth_keys(user.key_group)}</BoundPath>
     </py:if>
   </py:for>
